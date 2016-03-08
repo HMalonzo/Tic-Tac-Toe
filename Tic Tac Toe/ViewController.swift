@@ -54,10 +54,6 @@ class ViewController: UIViewController
         currentO = JHLogo
     }
     
-    override func supportedInterfaceOrientations() -> UIInterfaceOrientationMask {
-        return UIInterfaceOrientationMask.Portrait
-    }
-    
     @IBAction func didPan(sender: UIPanGestureRecognizer) {
         if switch4.on
         {
@@ -92,6 +88,10 @@ class ViewController: UIViewController
                         checkForWin()
                         newColor()
                         topLabel.text = "Current Turn: Player Two"
+                        if switch1.on
+                        {
+                            AIMove()
+                        }
                     }
                 }
                 else
@@ -134,14 +134,7 @@ class ViewController: UIViewController
             (imageDictionary[square1] == 1 && imageDictionary[square5] == 1 && imageDictionary[square9] == 1)
         {
             winner = 1
-            let alert = UIAlertController(title: "Player \(winner) won!", message: "Resetting Game...", preferredStyle: .Alert)
-            let ok = UIAlertAction(title: "OK", style: .Default, handler:
-                {
-                    sender in
-                    self.resetGame()
-            })
-            alert.addAction(ok)
-            presentViewController(alert, animated: true, completion: nil)
+            winAlert()
         }
         else if
             //Player 2 wins
@@ -155,14 +148,7 @@ class ViewController: UIViewController
             (imageDictionary[square1] == 2 && imageDictionary[square5] == 2 && imageDictionary[square9] == 2)
         {
             winner = 2
-            let alert = UIAlertController(title: "Player \(winner) won!", message: "Resetting Game...", preferredStyle: .Alert)
-            let ok = UIAlertAction(title: "OK", style: .Default, handler:
-                {
-                    sender in
-                    self.resetGame()
-            })
-            alert.addAction(ok)
-            presentViewController(alert, animated: true, completion: nil)
+            winAlert()
         }
         else if
             (imageDictionary[square1]! > 0) && (imageDictionary[square2]! > 0) && (imageDictionary[square3]! > 0) &&
@@ -180,6 +166,7 @@ class ViewController: UIViewController
         }
     
     }
+    
     func pingValues()
     {
         for image in imageDictionary
@@ -188,6 +175,7 @@ class ViewController: UIViewController
         }
 
     }
+    
     func resetGame()
     {
         for image in imageDictionary
@@ -199,6 +187,7 @@ class ViewController: UIViewController
             topLabel.text = "Current Turn: Player One"
         }
     }
+    
     func newColor()
     {
         if switch2.on
@@ -207,11 +196,37 @@ class ViewController: UIViewController
         }
     }
     
+    func winAlert()
+    {
+        let alert = UIAlertController(title: "Player \(winner) won!", message: "Resetting Game...", preferredStyle: .Alert)
+        let ok = UIAlertAction(title: "OK", style: .Default, handler:
+            {
+                sender in
+                self.resetGame()
+        })
+        alert.addAction(ok)
+        presentViewController(alert, animated: true, completion: nil)
+    }
+    
     func AIMove()
     {
         if switch1.on
         {
             //insert AI here
+            for image in imageDictionary
+            {
+                if image.0.image == blank
+                {
+                    imageDictionary[image.0] = 2
+                    image.0.image = currentO
+                    currentTurn = !currentTurn
+                    pingValues()
+                    checkForWin()
+                    newColor()
+                    topLabel.text = "Current Turn: Player One"
+                    break
+                }
+            }
         }
     }
     
@@ -222,6 +237,7 @@ class ViewController: UIViewController
         //Pan Label Toggle
     
     @IBAction func whenSwitch1Toggle(sender: UISwitch) {
+        resetGame()
     }
     
     @IBAction func whenSwitch2Toggle(sender: UISwitch) {
